@@ -3,7 +3,7 @@
 ## Installation and Startup
 
 ```bash
-git clone https://github.com/Urban-UAV-Corridors/Urban-UAV-Corridors-client.git
+git clone https://github.com/whlan02/Urban-UAV-Corridors_client.git
 
 ```
 
