@@ -66,7 +66,10 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (!mapBbox) return
+    if (!mapBbox || !layersEnabled.layer2d) {
+      setLoading2d(false)
+      return
+    }
     const controller = new AbortController()
     const { signal } = controller
     setLoading2d(true); setError2d(null)
@@ -75,10 +78,13 @@ function App() {
       .catch((e: unknown) => { if (!signal.aborted) { setData2d(null); setError2d(e instanceof Error ? e.message : String(e)) } })
       .finally(() => { if (!signal.aborted) setLoading2d(false) })
     return () => controller.abort()
-  }, [baseUrl, mapBbox])
+  }, [baseUrl, mapBbox, layersEnabled.layer2d])
 
   useEffect(() => {
-    if (!mapBbox) return
+    if (!mapBbox || !layersEnabled.layer3d) {
+      setLoading3d(false)
+      return
+    }
     const controller = new AbortController()
     const { signal } = controller
     setLoading3d(true); setError3d(null)
@@ -87,10 +93,13 @@ function App() {
       .catch((e: unknown) => { if (!signal.aborted) { setData3d(null); setError3d(e instanceof Error ? e.message : String(e)) } })
       .finally(() => { if (!signal.aborted) setLoading3d(false) })
     return () => controller.abort()
-  }, [baseUrl, mapBbox])
+  }, [baseUrl, mapBbox, layersEnabled.layer3d])
 
   useEffect(() => {
-    if (!mapBbox) return
+    if (!mapBbox || !layersEnabled.layerHdb) {
+      setLoadingHdb(false)
+      return
+    }
     const controller = new AbortController()
     const { signal } = controller
     setLoadingHdb(true); setErrorHdb(null)
@@ -99,7 +108,7 @@ function App() {
       .catch((e: unknown) => { if (!signal.aborted) { setDataHdb(null); setErrorHdb(e instanceof Error ? e.message : String(e)) } })
       .finally(() => { if (!signal.aborted) setLoadingHdb(false) })
     return () => controller.abort()
-  }, [baseUrl, mapBbox])
+  }, [baseUrl, mapBbox, layersEnabled.layerHdb])
 
   return (
     <div className="app-shell">
