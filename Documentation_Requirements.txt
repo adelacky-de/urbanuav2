@@ -30,3 +30,22 @@
 - 
 - 
 - 
+
+## Changelog (Compared to initial version)
+**Backend & Database:**
+- Integrated `hdb_footprints.geojson` into the data import pipeline.
+- Added PostGIS `GIST` indexes to all geometry columns (`corridors_2d`, `network_3d`, `hdb_footprints`) to drastically speed up spatial queries.
+- Updated FastAPI endpoints to accept `min_lon`, `min_lat`, `max_lon`, `max_lat` query parameters and selectively fetch data using `ST_Intersects`.
+
+**Frontend Performance:**
+- Implemented dynamic Bounding Box (BBOX) data loading attached to the Cesium camera `moveEnd` event to prevent fetching entire datasets.
+- Fixed infinite loading spinners caused by disabled layers.
+- Replaced the incredibly slow `scene.drillPick` method with `scene.pick` for instant object selection.
+- Overhauled the selection highlight logic from rebuilding batched geometry materials to injecting instant, standalone geometric overlays.
+
+**Frontend UX & Aesthetics:**
+- Completely purged emojis, Vite logos, and reset the HTML title.
+- Removed the heavy and clunky 3D Tileset layer entirely.
+- Added a collapsible **Layer Panel** for toggling visibility, opacity sliders, and dynamic color picking for the 2D layer.
+- Overhauled the **InfoBar** to elegantly accumulate features in a table format, and implemented a **CSV Export** button.
+- Replaced the static text labels on the Navigation Ball with a sleek, expandable icon-only menu (`⌖`, `Top`, `N`, `E`, `S`, `W`).
