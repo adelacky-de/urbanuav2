@@ -6,7 +6,6 @@ import {
   fetch3dNetwork,
   fetchHdbFootprints,
   getApiBaseUrl,
-  getTilesetUrl,
 } from './lib/api'
 import type {
   CorridorProperties,
@@ -18,7 +17,6 @@ import type {
 export type LayersEnabled = {
   layer2d: boolean
   layer3d: boolean
-  layerTileset: boolean
   layerHdb: boolean
 }
 
@@ -30,14 +28,12 @@ export type LayerStyle = {
 const DEFAULT_LAYERS: LayersEnabled = {
   layer2d: false,
   layer3d: true,
-  layerTileset: false,
   layerHdb: true,
 }
 
 const DEFAULT_STYLES: Record<keyof LayersEnabled, LayerStyle> = {
   layer2d: { colorHex: '#4da6ff', alpha: 0.53 },
   layer3d: { colorHex: '#64c864', alpha: 0.55 },
-  layerTileset: { colorHex: '#ffffff', alpha: 1 },
   layerHdb: { colorHex: '#b49670', alpha: 0.55 },
 }
 
@@ -56,7 +52,6 @@ function App() {
   const [mapBbox, setMapBbox] = useState<[number, number, number, number] | null>(null)
 
   const baseUrl = useMemo(() => getApiBaseUrl(), [])
-  const tilesetUrl = useMemo(() => getTilesetUrl(), [])
 
   const toggleLayer = useCallback((key: keyof LayersEnabled) => {
     setLayersEnabled((prev) => ({ ...prev, [key]: !prev[key] }))
@@ -114,7 +109,6 @@ function App() {
         dataHdb={dataHdb}
         layersEnabled={layersEnabled}
         layerStyles={layerStyles}
-        tilesetUrl={tilesetUrl}
         loading2d={loading2d}
         loading3d={loading3d}
         loadingHdb={loadingHdb}

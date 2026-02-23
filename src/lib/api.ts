@@ -89,11 +89,6 @@ export async function fetch3dNetwork(opts?: {
   return json as FeatureCollection<Network3DProperties>
 }
 
-export function getTilesetUrl(): string {
-  const baseUrl = getApiBaseUrl()
-  return `${baseUrl}/3dtiles/tileset.json`
-}
-
 export async function fetchHealth(opts?: {
   signal?: AbortSignal
 }): Promise<{ status: string }> {

@@ -319,8 +319,6 @@ body,
   display: flex;
   flex-direction: column;
   animation: slideUp 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-  /* Don't overlap nav ball on right */
-  padding-right: 155px;
 }
 
 .info-bar-tall {

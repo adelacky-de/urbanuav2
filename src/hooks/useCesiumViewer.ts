@@ -20,7 +20,6 @@ export function useCesiumViewer(
   containerRef: RefObject<HTMLDivElement | null>,
   setHovered: (info: HoveredInfo | null) => void,
   setSelected: (action: SelectedInfo[] | null | ((prev: SelectedInfo[] | null) => SelectedInfo[] | null)) => void,
-  tilesetRef: RefObject<Cesium.Cesium3DTileset | null>,
   onBoundsChange?: (bbox: [number, number, number, number]) => void
 ): {
   viewerRef: RefObject<Cesium.Viewer | null>
@@ -188,23 +187,13 @@ export function useCesiumViewer(
       clearTimeout(timeout)
       viewer.camera.moveEnd.removeEventListener(handleMoveEnd)
       handler.destroy()
-      const tileset = tilesetRef.current
-      if (tileset) {
-        try {
-          viewer.scene.primitives.remove(tileset)
-          ;(tileset as unknown as { destroy?: () => void }).destroy?.()
-        } catch {
-          // ignore
-        }
-        if ('current' in tilesetRef) tilesetRef.current = null
-      }
       viewer.destroy()
       viewerRef.current = null
       dataSource2dRef.current = null
       dataSource3dRef.current = null
       dataSourceHdbRef.current = null
     }
-  }, [containerRef, setHovered, setSelected, tilesetRef]) // exclude onBoundsChangeRef from deps
+  }, [containerRef, setHovered, setSelected]) // exclude onBoundsChangeRef from deps
 
   const clearSelection = () => {
     for (const item of selectedEntitiesRef.current) {

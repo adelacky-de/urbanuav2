@@ -25,7 +25,6 @@ type Props = {
   dataHdb: FeatureCollection<HdbFootprintProperties> | null
   layersEnabled: LayersEnabled
   layerStyles: Record<keyof LayersEnabled, LayerStyle>
-  tilesetUrl: string
   loading2d: boolean
   loading3d: boolean
   loadingHdb: boolean
@@ -69,7 +68,6 @@ export default function MapView({
   dataHdb,
   layersEnabled,
   layerStyles,
-  tilesetUrl,
   loading2d,
   loading3d,
   loadingHdb,
@@ -81,8 +79,6 @@ export default function MapView({
   onBoundsChange,
 }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const tilesetRef = useRef<Cesium.Cesium3DTileset | null>(null)
-
   const [hovered, setHovered] = useState<HoveredInfo | null>(null)
   const [selected, setSelected] = useState<SelectedInfo[] | null>(null)
   const [processing, setProcessing] = useState({ layer2d: false, layer3d: false, layerHdb: false })
@@ -91,7 +87,6 @@ export default function MapView({
     containerRef,
     setHovered,
     setSelected,
-    tilesetRef,
     onBoundsChange,
   )
 
@@ -150,40 +145,6 @@ export default function MapView({
     })
     return () => controller.abort()
   }, [dataSourceHdbRef, dataHdb, layersEnabled.layerHdb, layerStyles.layerHdb])
-
-  // 3D Tileset
-  useEffect(() => {
-    const viewer = viewerRef.current
-    if (!viewer || viewer.isDestroyed()) return
-    if (!layersEnabled.layerTileset || !tilesetUrl) {
-      if (tilesetRef.current) {
-        try {
-          viewer.scene.primitives.remove(tilesetRef.current)
-          ;(tilesetRef.current as unknown as { destroy?: () => void }).destroy?.()
-        } catch { /* ignore */ }
-        tilesetRef.current = null
-      }
-      return
-    }
-
-    let cancelled = false
-
-    Cesium.Cesium3DTileset.fromUrl(tilesetUrl, {})
-      .then((tileset) => {
-        if (cancelled || viewer.isDestroyed()) {
-          try { (tileset as unknown as { destroy?: () => void }).destroy?.() } catch { /* ignore */ }
-          return
-        }
-        viewer.scene.primitives.add(tileset)
-        tilesetRef.current = tileset
-      })
-      .catch((e: unknown) => {
-        if (cancelled) return
-        console.error('Failed to load 3D tileset', e)
-      })
-
-    return () => { cancelled = true }
-  }, [viewerRef, layersEnabled.layerTileset, tilesetUrl])
 
   // Check if any primary data layer is loaded or processing geometries
   const isLoading = loading2d || loading3d || loadingHdb || processing.layer2d || processing.layer3d || processing.layerHdb;
