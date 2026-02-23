@@ -121,41 +121,35 @@ export function useCesiumViewer(
 
     // Click to select (accumulate)
     handler.setInputAction((click: { position: Cesium.Cartesian2 }) => {
-      const pickedObjects = viewer.scene.drillPick(click.position)
-      if (pickedObjects.length === 0) return // clicking nothing shouldn't clear, just ignore
+      const picked = viewer.scene.pick(click.position)
+      if (!picked) return // clicking nothing shouldn't clear, just ignore
 
-      const newInfos: SelectedInfo[] = []
+      const id = (picked as { id?: unknown } | undefined)?.id as Cesium.Entity | undefined
+      const entity = id as unknown as EntityWithCorridor
+      const props = entity?._corridorProps
+      const layer = entity?._layer
 
-      for (const picked of pickedObjects) {
-        const id = (picked as { id?: unknown } | undefined)?.id as Cesium.Entity | undefined
-        const entity = id as unknown as EntityWithCorridor
-        const props = entity?._corridorProps
-        const layer = entity?._layer
+      if (props && layer && id && id.polygon) {
+        // Check if already selected
+        const alreadySelected = selectedEntitiesRef.current.some(s => s.entity === id)
+        if (alreadySelected) return
 
-        if (props && layer && id && id.polygon) {
-          // Check if already selected
-          const alreadySelected = selectedEntitiesRef.current.some(s => s.entity === id)
-          if (alreadySelected) continue
-
-          // Read current colour before overwriting
-          const mat = id.polygon.material
-          let origColor = Cesium.Color.WHITE.clone()
-          if (mat instanceof Cesium.ColorMaterialProperty) {
-            const val = mat.color?.getValue(Cesium.JulianDate.now())
-            if (val instanceof Cesium.Color) origColor = val.clone()
-          }
-          selectedEntitiesRef.current.push({ entity: id, color: origColor })
-
-          // Highlight yellow
-          id.polygon.material = new Cesium.ColorMaterialProperty(
-            new Cesium.ConstantProperty(Cesium.Color.fromBytes(255, 220, 0, 220)),
-          )
-          newInfos.push({ properties: props, layer })
+        // Read current colour before overwriting
+        const mat = id.polygon.material
+        let origColor = Cesium.Color.WHITE.clone()
+        if (mat instanceof Cesium.ColorMaterialProperty) {
+          const val = mat.color?.getValue(Cesium.JulianDate.now())
+          if (val instanceof Cesium.Color) origColor = val.clone()
         }
-      }
+        selectedEntitiesRef.current.push({ entity: id, color: origColor })
 
-      if (newInfos.length > 0) {
-        setSelected(prev => (prev ? [...prev, ...newInfos] : newInfos))
+        // Highlight yellow
+        id.polygon.material = new Cesium.ColorMaterialProperty(
+          new Cesium.ConstantProperty(Cesium.Color.fromBytes(255, 220, 0, 220)),
+        )
+        
+        const newInfo = { properties: props, layer }
+        setSelected(prev => (prev ? [...prev, newInfo] : [newInfo]))
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
 
