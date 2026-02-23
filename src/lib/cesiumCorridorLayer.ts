@@ -107,6 +107,7 @@ function addPolygon3d(
 function addPolygonHdb(
   ds: Cesium.CustomDataSource,
   rings: Position[][],
+  maxAlt: number,
   material: Cesium.Color,
   props: HdbFootprintProperties,
 ): void {
@@ -115,11 +116,13 @@ function addPolygonHdb(
     polygon: {
       hierarchy,
       height: 0,
-      extrudedHeight: 0,
+      extrudedHeight: maxAlt,
       material,
       outline: true,
       outlineColor: Cesium.Color.fromBytes(80, 60, 40, 160),
       perPositionHeight: false,
+      closeTop: true,
+      closeBottom: true,
     },
   })
   ;(entity as unknown as EntityWithCorridor)._corridorProps = props
@@ -235,9 +238,20 @@ export function syncHdbFootprintLayer(
       material = applyAlpha(material, alpha)
     }
 
+    let h = 0;
+    if (typeof props.height === 'number' && props.height > 0) {
+      h = props.height;
+    } else if (typeof props.levels === 'number') {
+      h = props.levels * 3;
+    } else if (typeof props.levels === 'string' && !isNaN(Number(props.levels))) {
+      h = Number(props.levels) * 3;
+    } else {
+      h = 10; // default generic height if nothing
+    }
+
     const addRings = (rings: Position[][]) => {
       if (!rings[0] || rings[0].length < 3) return
-      addPolygonHdb(ds!, rings, material, props as HdbFootprintProperties)
+      addPolygonHdb(ds!, rings, h, material, props as HdbFootprintProperties)
     }
 
     if (geom.type === 'Polygon') {

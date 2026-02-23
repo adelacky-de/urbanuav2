@@ -288,65 +288,64 @@ body,
 /* ============================================================
    NAVIGATION BALL (bottom-right)
    ============================================================ */
-.nav-ball {
+.nav-ball-container {
   position: absolute;
   z-index: 10;
-  right: 12px;
-  bottom: 12px;
-  display: grid;
-  grid-template-areas:
-    ". n ."
-    "w c e"
-    ". s .";
-  grid-template-columns: 32px 32px 32px;
-  grid-template-rows: 32px 32px 32px;
-  gap: 3px;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
-.nav-btn {
+.rolling-ball {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #689aff, #1a2f5f);
+  background-image: 
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.22), transparent 60%),
+    repeating-linear-gradient(0deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 11px),
+    repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 11px),
+    linear-gradient(#2a4f9f, #0f1b31);
+  background-position: var(--px, 0px) var(--py, 0px);
+  box-shadow: 
+    inset -4px -4px 10px rgba(0,0,0,0.6),
+    inset 4px 4px 10px rgba(255,255,255,0.4),
+    0 4px 14px rgba(0,0,0,0.45);
+  cursor: grab;
+  touch-action: none;
+}
+
+.rolling-ball.dragging {
+  cursor: grabbing;
+}
+
+.nav-btn-reset {
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 8px;
+  border-radius: 50%;
   background: rgba(15, 19, 35, 0.88);
   color: #c8d4f8;
-  font-size: 13px;
+  font-size: 16px;
   cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(6px);
-  transition:
-    background 0.15s,
-    transform 0.1s;
+  transition: background 0.15s, transform 0.1s;
   width: 32px;
   height: 32px;
 }
 
-.nav-btn:hover {
+.nav-btn-reset:hover {
   background: rgba(91, 140, 255, 0.35);
   transform: scale(1.08);
 }
 
-.nav-btn:active {
+.nav-btn-reset:active {
   transform: scale(0.95);
-}
-
-.nav-btn-n {
-  grid-area: n;
-}
-.nav-btn-s {
-  grid-area: s;
-}
-.nav-btn-w {
-  grid-area: w;
-}
-.nav-btn-e {
-  grid-area: e;
-}
-.nav-btn-c {
-  grid-area: c;
-  font-size: 16px;
-  color: #93c5fd;
 }
 
 /* ============================================================

@@ -28,9 +28,9 @@ export type LayerStyle = {
 }
 
 const DEFAULT_LAYERS: LayersEnabled = {
-  layer2d: true,
+  layer2d: false,
   layer3d: true,
-  layerTileset: true,
+  layerTileset: false,
   layerHdb: true,
 }
 

@@ -50,7 +50,18 @@ export function useCesiumViewer(
       infoBox: false,
       selectionIndicator: false,
       vrButton: false,
+      targetFrameRate: 60,
+      contextOptions: {
+        webgl: {
+          alpha: true,
+          antialias: true,
+        },
+      },
     })
+
+    viewer.scene.postProcessStages.fxaa.enabled = true
+    viewer.scene.msaaSamples = 4
+    viewer.resolutionScale = window.devicePixelRatio || 1
 
     viewer.imageryLayers.removeAll()
     viewer.imageryLayers.addImageryProvider(
