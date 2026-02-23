@@ -15,8 +15,7 @@ import { sync2dCorridorLayer, sync3dCorridorLayer, syncHdbFootprintLayer } from 
 import { useCesiumViewer } from '../hooks/useCesiumViewer'
 import type { HoveredInfo, SelectedInfo } from '../hooks/useCesiumViewer'
 import CorridorTooltip from './CorridorTooltip'
-import MapCornerNote from './MapCornerNote'
-import NavigationBall from './NavigationBall'
+import PerspectiveButton from './NavigationBall'
 import LayerPanel from './LayerPanel'
 import InfoBar from './InfoBar'
 
@@ -175,9 +174,19 @@ export default function MapView({
     return () => { cancelled = true }
   }, [viewerRef, layersEnabled.layerTileset, tilesetUrl])
 
+  // Check if any primary data layer is loading
+  const isLoading = loading2d || loading3d || loadingHdb;
+
   return (
     <div className="map-root">
       <div ref={containerRef} className="cesium-container" />
+
+      {isLoading && (
+        <div className="fullscreen-loading">
+          <div className="spinner" />
+          <div className="loading-text">Loading Spatial Data...</div>
+        </div>
+      )}
 
       <LayerPanel
         layersEnabled={layersEnabled}
@@ -193,8 +202,7 @@ export default function MapView({
       />
 
       {hovered && <CorridorTooltip hovered={hovered} />}
-      <MapCornerNote tilesetState={tilesetState} tilesetError={tilesetError} />
-      <NavigationBall viewerRef={viewerRef} />
+      <PerspectiveButton viewerRef={viewerRef} />
       <InfoBar selected={selected} />
     </div>
   )

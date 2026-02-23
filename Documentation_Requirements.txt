@@ -8,15 +8,16 @@
 (Please outline the required UI changes below)
 
 ## Functional Requirements
-- add a srolling ball on the right bottom, it makes the user can scroll their presepectives
+- add a perspective buttom on the right bottom, it makes the user can change their presepectives, e.g. one-click to go from direct ground level to north
 - add one more layer: '/Users/adelachu/Desktop/WWU/Analysis-Spatio/^Project/FinalReport/Case1_layer/hdb_footprints.geojson', i think it should be added to the api as well for the consistency
 - add a data bar now on the top left to be a expanable bar, when user click on the bar, they can 1. select the layer, 2. change colour of the layer, and 3. change transparency of the layer
 - add a info bar on the bottom bar
 - allow user to click on the polygon and info will show up on the info bar (if there are multiple visible layer show) all of them will turn yellow and show
 - the hdb footprints should be in 3D
-- the scrolling ball is a rolling ball user
 - the visualisation should be more smoother
 - default visible layer only building layer & 3D layer
+- the layer source box can be removed, the layer should be in the data bar
+- it required more time to load the building layer, using a circle load icon on the middle of the screen to show the wating process and add waiting time
 ## Aesthetic Requirements
 - 
 - 
