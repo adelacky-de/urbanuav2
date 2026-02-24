@@ -22,23 +22,40 @@ export interface EntityWithCorridor {
 
 function ringToDegreesFlat(ring: Position[]): number[] {
   const out: number[] = []
+  let minLon = Infinity
+  let maxLon = -Infinity
+  let minLat = Infinity
+  let maxLat = -Infinity
+
   for (const p of ring) {
     if (Array.isArray(p) && typeof p[0] === 'number' && typeof p[1] === 'number' && !Number.isNaN(p[0]) && !Number.isNaN(p[1])) {
-      // Deduplicate consecutive identical points
+      
+      // Track bounds to catch perfectly horizontal/vertical "polygons"
+      if (p[0] < minLon) minLon = p[0]
+      if (p[0] > maxLon) maxLon = p[0]
+      if (p[1] < minLat) minLat = p[1]
+      if (p[1] > maxLat) maxLat = p[1]
+
+      // Aggressive deduplication of consecutive identical points (1e-7 ~1cm)
       if (out.length >= 2) {
         const lastLon = out[out.length - 2]
         const lastLat = out[out.length - 1]
-        if (Math.abs(p[0] - lastLon) < 1e-10 && Math.abs(p[1] - lastLat) < 1e-10) {
-          continue // skip duplicate
+        if (Math.abs(p[0] - lastLon) < 1e-7 && Math.abs(p[1] - lastLat) < 1e-7) {
+          continue 
         }
       }
       out.push(p[0], p[1])
     }
   }
-  // GeoJSON says first and last should be identical. If our deduplication 
-  // stripped the last one, that's fine, Cesium handles unclosed loops. 
-  // However, if the first and last are identical and we *did* push it, we should ensure 
-  // it has at least 3 *unique* vertices (which means 4 points if closed, or 3 if unclosed).
+
+  // If the polygon is microscopically thin (e.g. max width < 1cm), it has no area 
+  // and will crash the Cesium triangulator normal calculator. Drop it.
+  const width = maxLon - minLon
+  const height = maxLat - minLat
+  if (width < 1e-7 || height < 1e-7) {
+      return [] 
+  }
+
   return out
 }
 
