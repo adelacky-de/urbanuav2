@@ -42,7 +42,11 @@ This document describes the current architecture of the Urban UAV Corridors web 
     *   Environment Variables:
         *   `PORT=8000`
         *   `DATABASE_URL=postgresql://postgres:sMLULwzfGkbXmJsPIZgjRVEtuCwUtmiV@shinkansen.proxy.rlwy.net:22459/railway`
-    *   Railway builds the Python FastAPI application directly from the `/fastapi` subfolder using a custom `Dockerfile`. The GeoJSON files had to be moved inside this `/fastapi` directory so the Docker build context could upload them to the Railway cloud runner.
+    *   **Folder Structure & Interaction:**
+        *   The Railway service is instructed to use the `/fastapi` sub-directory as the root directory for the build context.
+        *   `fastapi/main.py`: The entry point for the Uvicorn ASGI server.
+        *   `fastapi/*.geojson`: The three large data files (2D corridors, 3D network, HDB footprints) physically reside inside the `fastapi/` folder. During Server start up (`lifespan`), `main.py` explicitly reads these JSON files from the local disk into RAM.
+        *   **Interaction:** When the Vercel Frontend calls `GET https://brave-youthfulness-production-5dcd.up.railway.app/hdb-footprints`, Railway routes the request to the running `main.py` container. Because the 16MB of GeoJSON data was loaded into RAM during startup from the bundled local files, FastAPI instantly returns the massive JSON string back to the browser.
 
 ## 5. User Scenarios & Interactions
 1.  **Initial Load:** The user navigates to the Vercel URL. The React application mounts and immediately fetches all three GeoJSON datasets from the Railway API. A "Loading Spatial Data..." overlay is shown.
@@ -51,5 +55,16 @@ This document describes the current architecture of the Urban UAV Corridors web 
 4.  **Feature Interrogation:** The user physically clicks on a rendered polygon (e.g., a green 3D flight volume). The application highlights the specific polygon in yellow and opens the `InfoBar` at the bottom of the screen. The InfoBar dynamically generates a clean HTML table displaying all properties associated with that specific spatial feature (e.g., `priorityID`, `min_altitude`, `height`).
 
 ---
-**Current Critical Bug Context:**
-The application is correctly fetching data and the UI is fundamentally sound. However, the raw `.geojson` files contain mathematically degenerate geometry (e.g., self-intersecting polygons, bow-tie shapes, or polygons with fewer than 3 unique vertices). When CesiumJS's lower-level WebGL WebWorkers attempt to triangulate these broken shapes to draw 3D extrusions, the engine crashes completely with `TypeError: Cannot read properties of undefined (reading 'x')`. Client-side deduplication was attempted but is insufficient; the data itself requires complex spatial healing (e.g., `ST_MakeValid`), or the frontend requires a completely different rendering strategy (e.g., rendering bounding boxes instead of raw polygons if the polygon is mathematically corrupt).
+**Bugs Encountered & Solutions:**
+
+1. **Infinite Data Fetching Loops:** 
+   - *Bug:* Dynamic bounding box spatial queries triggered rapid, continuous data fetches during map navigation, crashing the browser.
+   - *Solution:* Migrated the architecture to statically serve the complete GeoJSON payloads once on initial load, bypassing complex managed PostGIS dependencies.
+2. **Production Network 404 Errors:** 
+   - *Bug:* The Vercel frontend failed to reach the Railway backend in production due to relative pathing.
+   - *Solution:* Configured a direct, explicit `VITE_API_BASE_URL` environment variable within Vercel to aggressively target the deployed Railway API.
+3. **Cesium 3D Geometry Crashes (`reading 'x' of undefined`):** 
+   - *Bug:* Backend GeoJSON data was originally encoded using raw Singapore SVY21 meters (EPSG:3414). Because Cesium natively requires WGS84 (EPSG:4326), it clamped the 30,000+ coordinates directly to the mathematical North Pole. This destroyed the building geometries and caused fatal triangulator division-by-zero bounds crashes.
+   - *Solution:* Completely re-projected all 16MB of GeoJSON files via GeoPandas into proper EPSG:4326 Longitude/Latitude format. A frontend "Shoelace Algorithm" area validator was also deployed to actively drop any mathematical zero-area features before they reach the 3D renderer.
+
+
