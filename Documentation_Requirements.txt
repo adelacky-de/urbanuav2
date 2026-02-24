@@ -49,3 +49,8 @@
 - Added a collapsible **Layer Panel** for toggling visibility, opacity sliders, and dynamic color picking for the 2D layer.
 - Overhauled the **InfoBar** to elegantly accumulate features in a table format, and implemented a **CSV Export** button.
 - Replaced the static text labels on the Navigation Ball with a sleek, expandable icon-only menu (`⌖`, `Top`, `N`, `E`, `S`, `W`).
+
+
+# remaining test
+- 1. try: instead of using intersection and tile, render the enitre layer to see if the rendering can be optimised a bit
+- 2. try: if case 1 failed, then try to import '/Users/adelachu/Desktop/WWU/Analysis-Spatio/^Project/FinalReport/Case1_layer/3D_merged_network.geojson' and set the original to default = false and visible this layer
