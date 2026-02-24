@@ -80,19 +80,23 @@ function addPolygon2d(
 ): void {
   const hierarchy = buildPolygonHierarchy(rings)
   if (!hierarchy) return
-  const entity = ds.entities.add({
-    polygon: {
-      hierarchy,
-      height: 0,
-      extrudedHeight: 0,
-      material,
-      outline: true,
-      outlineColor: OUTLINE_COLOR,
-      perPositionHeight: false,
-    },
-  })
-  ;(entity as unknown as EntityWithCorridor)._corridorProps = props
-  ;(entity as unknown as EntityWithCorridor)._layer = HOVER_LAYER_2D
+  try {
+    const entity = ds.entities.add({
+      polygon: {
+        hierarchy,
+        height: 0,
+        extrudedHeight: 0,
+        material,
+        outline: true,
+        outlineColor: OUTLINE_COLOR,
+        perPositionHeight: false,
+      },
+    })
+    ;(entity as unknown as EntityWithCorridor)._corridorProps = props
+    ;(entity as unknown as EntityWithCorridor)._layer = HOVER_LAYER_2D
+  } catch (e) {
+    console.warn('Skipping unrenderable 2D geometry', props.priorityID, e)
+  }
 }
 
 function addPolygon3d(
@@ -105,21 +109,25 @@ function addPolygon3d(
 ): void {
   const hierarchy = buildPolygonHierarchy(rings)
   if (!hierarchy) return
-  const entity = ds.entities.add({
-    polygon: {
-      hierarchy,
-      height: minAlt,
-      extrudedHeight: maxAlt,
-      material,
-      outline: true,
-      outlineColor: OUTLINE_COLOR,
-      perPositionHeight: false,
-      closeTop: true,
-      closeBottom: true,
-    },
-  })
-  ;(entity as unknown as EntityWithCorridor)._corridorProps = props
-  ;(entity as unknown as EntityWithCorridor)._layer = HOVER_LAYER_3D
+  try {
+    const entity = ds.entities.add({
+      polygon: {
+        hierarchy,
+        height: minAlt,
+        extrudedHeight: maxAlt,
+        material,
+        outline: true,
+        outlineColor: OUTLINE_COLOR,
+        perPositionHeight: false,
+        closeTop: true,
+        closeBottom: true,
+      },
+    })
+    ;(entity as unknown as EntityWithCorridor)._corridorProps = props
+    ;(entity as unknown as EntityWithCorridor)._layer = HOVER_LAYER_3D
+  } catch (e) {
+    console.warn('Skipping unrenderable 3D geometry', props.priorityID, e)
+  }
 }
 
 function addPolygonHdb(
@@ -131,21 +139,25 @@ function addPolygonHdb(
 ): void {
   const hierarchy = buildPolygonHierarchy(rings)
   if (!hierarchy) return
-  const entity = ds.entities.add({
-    polygon: {
-      hierarchy,
-      height: 0,
-      extrudedHeight: maxAlt,
-      material,
-      outline: true,
-      outlineColor: Cesium.Color.fromBytes(80, 60, 40, 160),
-      perPositionHeight: false,
-      closeTop: true,
-      closeBottom: true,
-    },
-  })
-  ;(entity as unknown as EntityWithCorridor)._corridorProps = props
-  ;(entity as unknown as EntityWithCorridor)._layer = HOVER_LAYER_HDB
+  try {
+    const entity = ds.entities.add({
+      polygon: {
+        hierarchy,
+        height: 0,
+        extrudedHeight: maxAlt,
+        material,
+        outline: true,
+        outlineColor: Cesium.Color.fromBytes(80, 60, 40, 160),
+        perPositionHeight: false,
+        closeTop: true,
+        closeBottom: true,
+      },
+    })
+    ;(entity as unknown as EntityWithCorridor)._corridorProps = props
+    ;(entity as unknown as EntityWithCorridor)._layer = HOVER_LAYER_HDB
+  } catch (e) {
+    console.warn('Skipping unrenderable HDB footprint', props.BLK_NO, e)
+  }
 }
 
 export function highlightEntity(entity: Cesium.Entity | null, originalColor: Cesium.Color | null): void {
