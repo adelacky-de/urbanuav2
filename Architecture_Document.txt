@@ -39,6 +39,9 @@ This document describes the current architecture of the Urban UAV Corridors web 
 *   **Backend Deployment:** Railway.
     *   URL: `https://brave-youthfulness-production-5dcd.up.railway.app`
     *   Git Repository: `https://github.com/adelacky-de/urban-uav-backend` (FastAPI)
+    *   Environment Variables:
+        *   `PORT=8000`
+        *   `DATABASE_URL=postgresql://postgres:sMLULwzfGkbXmJsPIZgjRVEtuCwUtmiV@shinkansen.proxy.rlwy.net:22459/railway`
     *   Railway builds the Python FastAPI application directly from the `/fastapi` subfolder using a custom `Dockerfile`. The GeoJSON files had to be moved inside this `/fastapi` directory so the Docker build context could upload them to the Railway cloud runner.
 
 ## 5. User Scenarios & Interactions
