@@ -64,15 +64,23 @@ function buildPolygonHierarchy(rings: Position[][]): Cesium.PolygonHierarchy | n
   const outerCoords = ringToDegreesFlat(rings[0])
   if (outerCoords.length < 6) return null // Need at least 3 [lon, lat] pairs
 
-  const holes = rings.slice(1)
-    .map(hole => ringToDegreesFlat(hole))
-    .filter(holeCoords => holeCoords.length >= 6)
-    .map(holeCoords => new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArray(holeCoords)))
+  try {
+    const outerCartesian = Cesium.Cartesian3.fromDegreesArray(outerCoords)
+    const holes: Cesium.PolygonHierarchy[] = []
+    
+    for (const holeCoords of rings.slice(1).map(ringToDegreesFlat)) {
+      if (holeCoords.length >= 6) {
+        holes.push(new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArray(holeCoords)))
+      }
+    }
 
-  return new Cesium.PolygonHierarchy(
-    Cesium.Cartesian3.fromDegreesArray(outerCoords),
-    holes
-  )
+    return new Cesium.PolygonHierarchy(outerCartesian, holes)
+  } catch (err) {
+    // If Cartesian3.fromDegreesArray encounters NaN or extreme floats that bypassed validation,
+    // it will throw here. We catch it and silently drop the corrupt polygon so it doesn't
+    // crash the WebWorker triangulator later with "Cannot read properties of undefined (reading 'length')"
+    return null
+  }
 }
 
 const OUTLINE_COLOR = Cesium.Color.fromBytes(20, 20, 20, 200)
@@ -107,7 +115,6 @@ function addPolygon2d(
         outline: true,
         outlineColor: OUTLINE_COLOR,
         perPositionHeight: false,
-        arcType: Cesium.ArcType.NONE,
       },
     })
     ;(entity as unknown as EntityWithCorridor)._corridorProps = props
@@ -137,7 +144,6 @@ function addPolygon3d(
         outline: true,
         outlineColor: OUTLINE_COLOR,
         perPositionHeight: false,
-        arcType: Cesium.ArcType.NONE,
         closeTop: true,
         closeBottom: true,
       },
@@ -168,7 +174,6 @@ function addPolygonHdb(
         outline: true,
         outlineColor: Cesium.Color.fromBytes(80, 60, 40, 160),
         perPositionHeight: false,
-        arcType: Cesium.ArcType.NONE,
         closeTop: true,
         closeBottom: true,
       },
