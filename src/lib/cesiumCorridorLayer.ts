@@ -59,17 +59,28 @@ function ringToDegreesFlat(ring: Position[]): number[] {
   return out
 }
 
+function getPolygonArea(coords: number[]): number {
+  let area = 0
+  const n = coords.length / 2
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n
+    area += coords[i * 2] * coords[j * 2 + 1] - coords[j * 2] * coords[i * 2 + 1]
+  }
+  return Math.abs(area / 2)
+}
+
 function buildPolygonHierarchy(rings: Position[][]): Cesium.PolygonHierarchy | null {
   if (!rings || !rings[0]) return null
   const outerCoords = ringToDegreesFlat(rings[0])
   if (outerCoords.length < 6) return null // Need at least 3 [lon, lat] pairs
+  if (getPolygonArea(outerCoords) < 1e-10) return null // Drop zero-area collinear polygons (~1.2 sq meters)
 
   try {
     const outerCartesian = Cesium.Cartesian3.fromDegreesArray(outerCoords)
     const holes: Cesium.PolygonHierarchy[] = []
     
     for (const holeCoords of rings.slice(1).map(ringToDegreesFlat)) {
-      if (holeCoords.length >= 6) {
+      if (holeCoords.length >= 6 && getPolygonArea(holeCoords) >= 1e-10) {
         holes.push(new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArray(holeCoords)))
       }
     }
