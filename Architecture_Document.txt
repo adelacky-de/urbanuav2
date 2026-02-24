@@ -37,7 +37,7 @@ This document describes the current architecture of the Urban UAV Corridors web 
     *   Git Repository: `https://github.com/adelacky-de/urbanuav2` (Client)
     *   Vercel acts as a static host for the compiled React SPA.
 *   **Backend Deployment:** Railway.
-    *   URL: `https://urban-uav-backend-production.up.railway.app`
+    *   URL: `https://brave-youthfulness-production-5dcd.up.railway.app`
     *   Git Repository: `https://github.com/adelacky-de/urban-uav-backend` (FastAPI)
     *   Railway builds the Python FastAPI application directly from the `/fastapi` subfolder using a custom `Dockerfile`. The GeoJSON files had to be moved inside this `/fastapi` directory so the Docker build context could upload them to the Railway cloud runner.
 
