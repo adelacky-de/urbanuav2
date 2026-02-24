@@ -90,6 +90,7 @@ function addPolygon2d(
         outline: true,
         outlineColor: OUTLINE_COLOR,
         perPositionHeight: false,
+        arcType: Cesium.ArcType.NONE,
       },
     })
     ;(entity as unknown as EntityWithCorridor)._corridorProps = props
@@ -119,6 +120,7 @@ function addPolygon3d(
         outline: true,
         outlineColor: OUTLINE_COLOR,
         perPositionHeight: false,
+        arcType: Cesium.ArcType.NONE,
         closeTop: true,
         closeBottom: true,
       },
@@ -149,6 +151,7 @@ function addPolygonHdb(
         outline: true,
         outlineColor: Cesium.Color.fromBytes(80, 60, 40, 160),
         perPositionHeight: false,
+        arcType: Cesium.ArcType.NONE,
         closeTop: true,
         closeBottom: true,
       },
